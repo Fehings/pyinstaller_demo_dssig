@@ -8,6 +8,12 @@ Clone this repository:
 Setup:
 
 `python -m venv ./.env`
+
+or 
+`python3 -m venv ./.env`
+then activate the environment:
+`source .env/bin/activate`
+then:
 `pip install -r requirements.txt`
 
 There are two apps to try with pyinstaller, a pyside6 based one, and a shiny one. 
