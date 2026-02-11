@@ -1,0 +1,121 @@
+# Selection of active policy and algorithm
+active_configuration:
+  policy: "ALLOCATION_SCORE"  # The selected policy
+  algorithm: "NORMAL"  # The selected algorithm
+  parameters:
+    WL_ratio: 1   # Parameters specific to selected algorithm
+    PTX_ratio: 1  # Parameters specific to selected algorithm
+  screening: "lung"  # Screening method to use: "lung" or "abo"
+  screening_parameters:
+    slt: false  # Whether to use single lung transplant screening (only relevant for lung policies)
+    exclude: []  # List of patient IDs to exclude from allocation (e.g. previous recipients of the organ being allocated)
+    max_height_delta_cm: 15  # Maximum height difference (in cm) allowed between donor and recipient (only relevant for lung policies)
+    recipient_minimum_age: 0  # Minimum age for single lung transplant recipients
+    small_adult_max_height_cm: 155.0  # Maximum height for small adult category (only relevant for lung policies)
+
+# Available options
+policies:
+  - name: "NHSBT_SIMPLE_PRE_2017"
+    description: "A simplified version of the current (as of September 2024) NHS-BT lung allocation policy. The simplification is necessary due to the `urgency` field not being valid for candidates listed before 2017. "
+    algorithms:
+      - name: "NORMAL"
+        description: ""
+
+  - name: "NHSBT_FULL_POST_2017"
+    description: "A full implementation of the NHS-BT lung allocation policy. NOTE: This is only valid if the cohort being simulated is sourced from post-2017 data."
+    algorithms:
+      - name: "NORMAL"
+        description: ""
+
+  - name: "ALLOCATION_SCORE"
+    description: "Weighted allocation, that is, specifying priority-ratios for the relative importance of waiting list and post-transplant survival when calculating allocation scores. You must specify the Waiting List ratio and Post Transplant ratio parameters. For example, to simulate the 2:1 WL:PTX ratio that the lung allocation score in the US used to use, Waiting List ratio should be set equal to 2 and Post Transplant ratio should be set equal to 1."
+    algorithms:
+      - name: "NORMAL"
+        description: "Default, with no single lung transplant."
+        parameters:
+          WL_ratio: 1   # Example weighting ratio for the waiting list 
+          PTX_ratio: 1  # Example weighting ratio for post transplant
+      - name: "SLT_THESIS"
+        description: "Single lung transplant policy proposed and described in the thesis 'Using Descrete Event Simulation to Optimise Donor Lung Allocation' by Sam Kennedy. "
+        parameters:
+          WL_ratio: 1  
+          PTX_ratio: 1  
+      - name: "SLT_MAXIMIN"
+        description: "Single lung transplant policy"
+        parameters:
+          WL_ratio: 1 
+          PTX_ratio: 1  
+      - name: "SLT_MAXIMAX"
+        description: "Single lung transplant policy"
+        parameters:
+          WL_ratio: 1 
+          PTX_ratio: 1  
+      - name: "SLT_MINIMAX_REGRET"
+        description: "Single lung transplant policy"
+        parameters:
+          WL_ratio: 1  
+          PTX_ratio: 1  
+      - name: "SLT_MAX_SUM"
+        description: "Highest sum of net benefit Strategy using single lung transplants."
+        parameters:
+          WL_ratio: 1 
+          PTX_ratio: 1  
+
+  - name: "CONDITIONAL_1_1"
+    description: "Conditional survival policy giving equal weight to post transplant and waiting list survival. You must specify the number of days survival is conditioned over into the future (`prediction_period_days`)"
+    algorithms:
+      - name: "NORMAL"
+        description: ""
+        parameters:
+          prediction_period_days: 10
+
+  - name: "CONDITIONAL_WL"
+    description: "Conditional survival policy only taking into account waiting list survival.  You must specify the number of days survival is conditioned over into the future (`prediction_period_days`). "
+    algorithms:
+      - name: "NORMAL"
+        description: ""
+        parameters:
+          prediction_period_days: 10 
+
+  - name: "RISK_ADJUSTED_BENEFIT"
+    description: "Risk-adjusted benefit ('RAB' policies in thesis) using the 1:1 WL:PTX policy. You must specify how much weight is given to the risk adjustment via the `RISK_WEIGHT` parameter."
+    algorithms:
+      - name: "NORMAL"
+        description: ""
+        parameters:
+          risk_weight: 0.50   # Example parameter for Algorithm2
+
+  - name: "WAITING_TIME"
+    description: "Allocation based solely on waiting time."
+    algorithms:
+      - name: "NORMAL"
+        description: ""
+
+  - name: "RANDOM_ALLOCATION"
+    description: "Use randomised allocation."
+    algorithms:
+      - name: "NORMAL"
+        description: ""
+
+  - name: "COMPOSITE_ALLOCATION"
+    description: "Weighted allocation specifying priority-ratings for waiting list, post-transplant survival, paediatric priority, height priority and geographical proximity."
+    algorithms:
+      - name: "NORMAL"
+        description: "Default with specific weights."
+        parameters:
+          WL_weight: 20   # Example weighting ratio for the waiting list 
+          WL_maxdays: 730  # Example maximum number of days for waiting list expected value
+          PTX_weight: 40  # Example weighting ratio for post transplant
+          PTX_maxdays: 1826  # Example maximum number of days for post-transplant expected value
+          PAED_weight: 20  # Example weighting ratio for paediatric priority
+          PAED_threshold: 18  # Example age threshold for paediatric priority (in years)
+          HEIGHT_weight: 10  # Example weighting ratio for height priority
+          HEIGHT_threshold: 155  # Example height threshold for height priority (in cm)
+          GEO_weight: 10  # Example weighting ratio for geographical proximity
+
+screening:
+  methods:
+    - name: "lung"
+      description: "Screening method for lung allocation, including ABO and height compatibility, and optionally SLT eligibility."
+    - name: "abo"
+      description: "Screening method based only on ABO compatibility."
